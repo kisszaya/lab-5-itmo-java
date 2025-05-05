@@ -1,35 +1,25 @@
-package musicBandCreationService;
+package entities;
 
-import entities.*;
 import printer.Printer;
 import printer.PrinterStatus;
 import scanner.ScannerWrapper;
-import transformer.Transformer;
-import validation.*;
+import utils.Transformer;
+import validation.IsEnumValidationStep;
+import validation.NotNullValidationStep;
+import validation.ValidationResult;
 
 import java.util.Arrays;
 
-public class MusicBandCreationService {
+public class MusicBandFromScanner {
     private final ScannerWrapper scanner;
     private final Printer printer;
 
-    public MusicBandCreationService(ScannerWrapper scanner, Printer printer) {
+    public MusicBandFromScanner(ScannerWrapper scanner, Printer printer) {
         this.scanner = scanner;
         this.printer = printer;
     }
 
-    public MusicBand requestFromScanner() {
-        String name = requestField("название группы", MusicBand::validateName, Transformer::toString);
-        Coordinates coordinates = requestCoordinates();
-        Integer numberOfParticipants = requestField("количество участников", MusicBand::validateNumberOfParticipants, Transformer::toInteger);
-        Integer albumsCount = requestField("количество альбомов", MusicBand::validateAlbumsCount, Transformer::toInteger);
-        MusicGenre genre = requestField("жанр " + Arrays.toString(MusicGenre.values()), MusicBand::validateGenre, value -> Transformer.toEnum(MusicGenre.class, value));
-        Person frontMan = requestFrontMan();
-
-        return new MusicBand(name, coordinates, numberOfParticipants, albumsCount, genre, frontMan);
-    }
-
-    private Person requestFrontMan() {
+    public Person requestFrontMan() {
         YesNoEnum isRequest = requestField("хотите ли добавить frontMan " + Arrays.toString(YesNoEnum.values()),
                 value -> new NotNullValidationStep().linkNext(new IsEnumValidationStep<>(YesNoEnum.values())).validate(value),
                 value -> Transformer.toEnum(YesNoEnum.class, value));
@@ -53,7 +43,7 @@ public class MusicBandCreationService {
         return new Person(name, passportId, hairColor, nationality, location);
     }
 
-    private Location requestFrontManLocation() {
+    public Location requestFrontManLocation() {
         Integer x = requestField("локацию frontName, координата x", Location::validateX, Transformer::toInteger);
         Integer y = requestField("локацию frontName, координата y", Location::validateY, Transformer::toInteger);
         Long z = requestField("локацию frontName, координата z", Location::validateZ, Transformer::toLong);
@@ -61,7 +51,7 @@ public class MusicBandCreationService {
         return new Location(x, y, z, name);
     }
 
-    private Coordinates requestCoordinates() {
+    public Coordinates requestCoordinates() {
         double x = requestField("координату x", Coordinates::validateX, Transformer::toDouble);
         Long y = requestField("координату y", Coordinates::validateY, Transformer::toLong);
         return new Coordinates(x, y);
@@ -78,7 +68,7 @@ public class MusicBandCreationService {
     }
 
 
-    private <T> T requestField(String messageName, RequestFieldValidation validate, RequestFieldTransformation<T> transform) {
+    public  <T> T requestField(String messageName, RequestFieldValidation validate, RequestFieldTransformation<T> transform) {
         String field;
         printer.print(String.format("Введите %s: ", messageName));
         while (true) {

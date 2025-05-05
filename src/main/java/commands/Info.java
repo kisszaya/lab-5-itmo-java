@@ -5,7 +5,7 @@ import printer.Printer;
 import musicBandRepository.MusicBandRepository;
 import printer.PrinterStatus;
 import scanner.ScannerWrapper;
-import transformer.Transformer;
+import utils.Transformer;
 import validation.ValidationResult;
 
 public class Info extends BandCommand {
@@ -27,8 +27,8 @@ public class Info extends BandCommand {
             return;
         }
         long id = Transformer.toLong(rawId);
-        MusicBand musicBand = this.musicBandRepository.getById(id);
-        if (musicBand == null) {
+        var musicBand = this.musicBandRepository.getById(id);
+        if (musicBand.isEmpty()) {
             printer.println("MusicBand с id не существует", PrinterStatus.ERROR);
             return;
         }

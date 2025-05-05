@@ -3,7 +3,7 @@ package validation;
 public abstract class ValidationStep<T> {
     ValidationStep<T> next = null;
 
-    public ValidationStep<T> linkNext (ValidationStep<T> newStep) {
+    public ValidationStep<T> linkNext(ValidationStep<T> newStep) {
         if (this.next == null) {
             this.next = newStep;
             return this;
@@ -17,9 +17,9 @@ public abstract class ValidationStep<T> {
         return this;
     }
 
-    abstract public ValidationResult validate (T toValidate);
+    abstract public ValidationResult validate(T toValidate);
 
-    protected ValidationResult checkNext (T toValidate) {
+    protected ValidationResult checkNext(T toValidate) {
         if (next == null) {
             return ValidationResult.valid();
         }

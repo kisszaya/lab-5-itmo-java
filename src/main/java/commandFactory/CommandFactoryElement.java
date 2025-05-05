@@ -1,12 +1,12 @@
-package commandRegistry;
+package commandFactory;
 
-public class CommandRegistryElement {
+public class CommandFactoryElement {
     public String name;
     public String description;
     public String args;
     public CreateCommandLambda createCommand;
 
-    public CommandRegistryElement(
+    public CommandFactoryElement(
             String name,
             String description,
             String args,

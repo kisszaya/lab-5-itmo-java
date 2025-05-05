@@ -1,4 +1,4 @@
-package commandRegistry;
+package commandFactory;
 
 import commands.Command;
 import scanner.ScannerWrapper;

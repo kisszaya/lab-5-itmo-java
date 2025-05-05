@@ -1,19 +1,19 @@
 package commands;
 
-import commandRegistry.CommandRegistry;
+import commandFactory.CommandFactory;
 import printer.Printer;
 import scanner.ScannerWrapper;
 
 public class Help extends Command {
-    CommandRegistry commandRegistry;
+    CommandFactory commandFactory;
 
-    public Help(ScannerWrapper scanner, Printer printer, CommandRegistry commandRegistry) {
+    public Help(ScannerWrapper scanner, Printer printer, CommandFactory commandFactory) {
         super(scanner, printer);
-        this.commandRegistry = commandRegistry;
+        this.commandFactory = commandFactory;
     }
 
     @Override
     public void execute(String[] args) {
-        printer.printlnWithTab(this.commandRegistry.toString());
+        printer.printlnWithTab(this.commandFactory.toString());
     }
 }

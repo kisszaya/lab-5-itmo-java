@@ -1,4 +1,4 @@
-package musicBandCreationService;
+package entities;
 
 public enum YesNoEnum {
     YES,

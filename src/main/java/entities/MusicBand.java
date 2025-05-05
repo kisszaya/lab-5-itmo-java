@@ -1,14 +1,17 @@
 package entities;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.time.LocalDateTime;
 import java.util.Random;
 
-import exceptions.MusicBandJSONException;
 import org.json.JSONException;
 import org.json.JSONObject;
-import transformer.Transformer;
+import printer.Printer;
+import scanner.ScannerWrapper;
+import utils.Transformer;
 import validation.*;
 
 public class MusicBand {
@@ -21,8 +24,16 @@ public class MusicBand {
     private MusicGenre genre; //Поле не может быть null
     private Person frontMan; //Поле может быть null
 
-    public MusicBand(String name, Coordinates coordinates, int numberOfParticipants, int albumsCount, MusicGenre genre, Person frontMan) {
-        this(name, coordinates, numberOfParticipants, albumsCount, genre, frontMan, LocalDateTime.now(), generateId());
+    public MusicBand (ScannerWrapper scanner, Printer printer) {
+        MusicBandFromScanner musicBandFromScanner = new MusicBandFromScanner(scanner, printer);
+        this.name = musicBandFromScanner.requestField("название группы", MusicBand::validateName, Transformer::toString);
+        this.coordinates = musicBandFromScanner.requestCoordinates();
+        this.creationDate = LocalDateTime.now();
+        this.numberOfParticipants = musicBandFromScanner.requestField("количество участников", MusicBand::validateNumberOfParticipants, Transformer::toInteger);
+        this.albumsCount = musicBandFromScanner.requestField("количество альбомов", MusicBand::validateAlbumsCount, Transformer::toInteger);
+        this.genre = musicBandFromScanner.requestField("жанр " + Arrays.toString(MusicGenre.values()), MusicBand::validateGenre, value -> Transformer.toEnum(MusicGenre.class, value));
+        this.frontMan = musicBandFromScanner.requestFrontMan();
+        this.id = generateId();
     }
 
     public MusicBand(String name, Coordinates coordinates, int numberOfParticipants, int albumsCount, MusicGenre genre, Person frontMan, LocalDateTime creationDate, long id) {
@@ -36,7 +47,7 @@ public class MusicBand {
         this.id = id;
     }
 
-    public MusicBand(JSONObject obj) throws MusicBandJSONException {
+    public MusicBand(JSONObject obj) throws IOException {
         this.id = this.validateJsonField(obj, "id", MusicBand::validateId, Transformer::toLong);
         this.name = this.validateJsonField(obj, "name", MusicBand::validateName, Transformer::toString);
         this.creationDate = this.validateJsonField(obj, "creationDate", MusicBand::validateCreationDate, Transformer::toLocalDateTime);
@@ -98,22 +109,23 @@ public class MusicBand {
         return Math.abs((new Random()).nextLong());
     }
 
-
-    private <T> T validateJsonField(JSONObject obj, String fieldName, RequestFieldValidation validate, RequestFieldTransformation<T> transform) throws MusicBandJSONException {
+    private <T> T validateJsonField(JSONObject obj, String fieldName, RequestFieldValidation validate, RequestFieldTransformation<T> transform) throws IOException {
         try {
             Object field = obj.get(fieldName);
             String fieldString = field.toString();
             ValidationResult validationResult = validate.validate(fieldString);
             if (!validationResult.getIsValid()) {
-                throw new MusicBandJSONException(
-                        String.format("Проблемы с полем %s: %s",
+                throw new IOException(
+                        String.format(
+                                "Проблемы с полем %s: %s",
                                 fieldName,
                                 validationResult.getMessage()
-                        ), fieldName);
+                        )
+                );
             }
             return transform.transform(fieldString);
         } catch (JSONException err) {
-            throw new MusicBandJSONException("Не получается прочитать поле из JSON", fieldName);
+            throw new IOException("Не получается прочитать поле из JSON");
         }
     }
 

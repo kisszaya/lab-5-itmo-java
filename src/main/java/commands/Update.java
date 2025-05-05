@@ -1,24 +1,18 @@
 package commands;
 
 import entities.MusicBand;
-import exceptions.MusicBandNotFound;
-import musicBandCreationService.MusicBandCreationService;
-import musicBandCreationService.MusicBandCreationServiceFactory;
 import musicBandRepository.MusicBandRepository;
 import printer.Printer;
 import printer.PrinterStatus;
 import scanner.ScannerWrapper;
-import transformer.Transformer;
+import utils.Transformer;
 import validation.IsLongValidationStep;
 import validation.ValidationResult;
 
-
 public class Update extends BandCommand {
-    private final MusicBandCreationService musicBandCreationService;
 
-    public Update(ScannerWrapper scanner, Printer printer, MusicBandRepository musicBandRepository, MusicBandCreationServiceFactory musicBandCreationServiceFactory) {
+    public Update(ScannerWrapper scanner, Printer printer, MusicBandRepository musicBandRepository) {
         super(scanner, printer, musicBandRepository);
-        this.musicBandCreationService = musicBandCreationServiceFactory.createMusicBandCreationService(scanner);
     }
 
     @Override
@@ -36,10 +30,10 @@ public class Update extends BandCommand {
         }
         long id = Transformer.toLong(stringId);
 
-        MusicBand updatedFields = musicBandCreationService.requestFromScanner();
+        MusicBand updatedMusicBand = new MusicBand(scanner, printer);
         try {
-            this.musicBandRepository.updateById(id, updatedFields);
-        } catch (MusicBandNotFound exc) {
+            this.musicBandRepository.updateById(id, updatedMusicBand);
+        } catch (IllegalArgumentException exc) {
             printer.println("Не нашли MusicBand с id " + stringId, PrinterStatus.ERROR);
             return;
         }

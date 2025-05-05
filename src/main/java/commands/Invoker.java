@@ -1,7 +1,7 @@
 package commands;
 
 import printer.Printer;
-import exceptions.ExitProgramException;
+import exceptions.ExitCommandException;
 import printer.PrinterStatus;
 
 public class Invoker {
@@ -20,7 +20,7 @@ public class Invoker {
             printer.printlnStartAction("Начало выполнения команды");
             command.execute(args);
             printer.printlnEndAction("Окончание выполнения команды");
-        } catch (ExitProgramException exception) {
+        } catch (ExitCommandException exception) {
             return true;
         }
         return false;
